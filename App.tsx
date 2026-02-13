@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   LayoutDashboard, 
@@ -38,10 +37,12 @@ import {
   Trash2,
   AlertCircle,
   Tag,
-  Phone
+  Phone,
+  FileSpreadsheet
 } from 'lucide-react';
 import { AppData, Product, Client, Transaction, InventoryLog, Tab, UnitType } from './types.ts';
 import { generateInvoicePDF } from './services/pdfService.ts';
+import { exportInvoicesToExcel } from './services/excelService.ts';
 
 const INITIAL_DATA: AppData = {
   inventory: [],
@@ -79,8 +80,12 @@ const SidebarItem = ({ active, onClick, icon, label }: { active: boolean, onClic
   </button>
 );
 
-const Card: React.FC<{ children?: React.ReactNode; className?: string; stagger?: string }> = ({ children, className = "", stagger = "" }) => (
-  <div className={`bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-1.5 animate-slide-up opacity-0 ${stagger} ${className}`}>
+// Added onClick prop to allow Card component to respond to click events and fixed type definition
+const Card: React.FC<{ children?: React.ReactNode; className?: string; stagger?: string; onClick?: () => void }> = ({ children, className = "", stagger = "", onClick }) => (
+  <div 
+    onClick={onClick}
+    className={`bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-1.5 animate-slide-up opacity-0 ${stagger} ${className}`}
+  >
     {children}
   </div>
 );
@@ -928,9 +933,17 @@ const App: React.FC = () => {
                 <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Invoices</h2>
                 <p className="text-slate-500 font-medium">Primary sales history</p>
               </div>
-              <button onClick={() => setShowDispatch(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-2xl flex items-center justify-center gap-2 transition-all font-bold shadow-xl shadow-emerald-100 active:scale-95">
-                <Receipt size={20} /> Create Invoice
-              </button>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => exportInvoicesToExcel(data.transactions, data.clients, data.inventory)} 
+                  className="bg-indigo-50 border border-indigo-100 text-indigo-600 px-6 py-3 rounded-2xl flex items-center justify-center gap-2 transition-all font-bold hover:bg-indigo-100 active:scale-95"
+                >
+                  <FileSpreadsheet size={20} /> Export Excel
+                </button>
+                <button onClick={() => setShowDispatch(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-2xl flex items-center justify-center gap-2 transition-all font-bold shadow-xl shadow-emerald-100 active:scale-95">
+                  <Receipt size={20} /> Create Invoice
+                </button>
+              </div>
             </header>
 
             <Card className="overflow-hidden border-none shadow-xl">
