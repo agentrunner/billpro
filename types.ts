@@ -6,15 +6,17 @@ export interface Product {
   name: string;
   unit: UnitType;
   currentStock: number;
+  avgPurchaseRate: number; // Tracks weighted average cost
+  saleRate: number;        // Default selling price
   createdAt: number;
-  lastUpdated: number; // Added tracking for edits
+  lastUpdated: number;
 }
 
 export interface InventoryLog {
   id: string;
   productId: string;
   productName: string;
-  type: 'manual' | 'dispatch';
+  type: 'manual' | 'dispatch' | 'purchase';
   change: number;
   reason: string;
   timestamp: number;
@@ -30,13 +32,14 @@ export interface Client {
 
 export interface Transaction {
   id: string;
-  clientId: string;
+  clientId?: string;
   productId: string;
   productName: string;
-  type: 'dispatch' | 'sale';
+  type: 'dispatch' | 'sale' | 'purchase' | 'client_sale';
   quantity: number;
   rate?: number;
   total?: number;
+  profit?: number; // Calculated at time of dispatch or sale
   billNumber?: string;
   timestamp: number;
 }
@@ -57,5 +60,6 @@ export enum Tab {
   Inventory = 'inventory',
   Clients = 'clients',
   Billing = 'billing',
+  ClientSales = 'client_sales',
   Logs = 'logs'
 }
